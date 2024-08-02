@@ -105,4 +105,4 @@ swap_image = pipe(
 ).images[0]
 ```
 
-We also provide the `demo.ipynb` notebook, which guides you through the steps mentioned above.
+We also provide the [demo.ipynb](https://github.com/hanweikung/fams/blob/main/demo.ipynb) notebook, which guides you through the steps mentioned above.
