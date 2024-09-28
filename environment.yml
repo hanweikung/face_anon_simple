@@ -14,3 +14,4 @@ dependencies:
     - xformers
     - bitsandbytes
     - ipykernel
+    - face-alignment
