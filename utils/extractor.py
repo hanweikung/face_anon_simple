@@ -284,7 +284,7 @@ def get_transform_mat(image_landmarks, output_size, face_type, scale=1.0):
     return mat
 
 
-def extract_faces(model, image, face_image_size, face_type):
+def extract_faces(model, image, face_image_size, face_type=FaceType.WHOLE_FACE):
     array = np.array(image)
     preds = model.get_landmarks(array)
 
