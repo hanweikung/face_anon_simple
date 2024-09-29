@@ -1,4 +1,4 @@
-name: fams
+name: face-anon-simple
 dependencies:
   - python=3.8
   - pip

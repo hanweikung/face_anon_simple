@@ -5,7 +5,7 @@
 1. Clone the repository.
 
 ```bash
-git clone https://github.com/hanweikung/fams.git
+git clone https://github.com/hanweikung/face_anon_simple.git
 ```
 
 2. Create a Python environment from the `environment.yml` file.
@@ -35,18 +35,18 @@ from src.diffusers.pipelines.referencenet.pipeline_referencenet import (
 2. Create & load models.
 
 ```python
-fams_model_id = "hkung/fams"
+face_model_id = "hkung/face-anon-simple"
 clip_model_id = "openai/clip-vit-large-patch14"
 sd_model_id = "stabilityai/stable-diffusion-2-1"
 
 unet = UNet2DConditionModel.from_pretrained(
-    fams_model_id, subfolder="unet", use_safetensors=True
+    face_model_id, subfolder="unet", use_safetensors=True
 )
 referencenet = ReferenceNetModel.from_pretrained(
-    fams_model_id, subfolder="referencenet", use_safetensors=True
+    face_model_id, subfolder="referencenet", use_safetensors=True
 )
 conditioning_referencenet = ReferenceNetModel.from_pretrained(
-    fams_model_id, subfolder="conditioning_referencenet", use_safetensors=True
+    face_model_id, subfolder="conditioning_referencenet", use_safetensors=True
 )
 vae = AutoencoderKL.from_pretrained(sd_model_id, subfolder="vae", use_safetensors=True)
 scheduler = DDPMScheduler.from_pretrained(
@@ -147,4 +147,4 @@ swap_image = pipe(
 swap_image.save("swap.png")
 ```
 
-We also provide the [demo.ipynb](https://github.com/hanweikung/fams/blob/main/demo.ipynb) notebook, which guides you through the steps mentioned above.
+We also provide the [demo.ipynb](https://github.com/hanweikung/face_anon_simple/blob/main/demo.ipynb) notebook, which guides you through the steps mentioned above.
