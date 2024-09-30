@@ -148,3 +148,7 @@ swap_image.save("swap.png")
 ```
 
 We also provide the [demo.ipynb](https://github.com/hanweikung/face_anon_simple/blob/main/demo.ipynb) notebook, which guides you through the steps mentioned above.
+
+## Acknowledgements
+
+This work is built upon the [Diffusers](https://github.com/huggingface/diffusers) project. The [face extractor](https://github.com/hanweikung/face_anon_simple/blob/main/utils/extractor.py) is adapted from [DeepFaceLab](https://dagshub.com/idonov/DeepFaceLab/src/master/mainscripts/Extractor.py).
