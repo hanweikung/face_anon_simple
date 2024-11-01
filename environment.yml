@@ -5,6 +5,7 @@ dependencies:
   - pip:
     - torch==2.1
     - torchvision
+    - huggingface_hub<0.26.0
     - diffusers==0.25.0
     - transformers
     - accelerate
