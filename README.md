@@ -1,4 +1,6 @@
-# Face Anonymization Made Simple
+# Face Anonymization Made Simple (WACV 2025)
+
+![teaser](teaser.jpg)
 
 ## Setup
 
