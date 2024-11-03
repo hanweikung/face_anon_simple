@@ -73,7 +73,9 @@ pipe = pipe.to("cuda")
 generator = torch.manual_seed(1)
 ```
 
-3. Create an anonymized version of an image if the image contains a single face and that face has already been aligned similarly to those in the [FFHQ](https://github.com/NVlabs/ffhq-dataset) or [CelebA-HQ](https://github.com/tkarras/progressive_growing_of_gans) datasets.
+### Anonymize images with a single aligned face
+
+Create an anonymized version of an image if the image contains a single face and that face has already been aligned similarly to those in the [FFHQ](https://github.com/NVlabs/ffhq-dataset) or [CelebA-HQ](https://github.com/tkarras/progressive_growing_of_gans) datasets.
 
 ```python
 # get an input image for anonymization
@@ -91,7 +93,9 @@ anon_image = pipe(
 anon_image.save("anon.png")
 ```
 
-4. Create an anonymized version of an image if it contains one or more unaligned faces.
+### Anonymize images with one or multiple unaligned faces
+
+Create an anonymized version of an image if it contains one or more unaligned faces.
 
 ```python
 import face_alignment
@@ -130,7 +134,9 @@ for original_face_image, image_to_face_mat in zip(
 anon_image.save("anon.png")
 ```
 
-4. Create an image that swap faces.
+### Swap faces between two images
+
+Create an image that swap faces.
 
 ```python
 # get source and conditioning (driving) images for face swap
