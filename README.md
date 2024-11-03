@@ -99,8 +99,7 @@ Create an anonymized version of an image if it contains one or more unaligned fa
 
 ```python
 import face_alignment
-from utils.extractor import extract_faces
-from utils.merger import paste_foreground_onto_background
+from utils.anonymize_faces_in_image import anonymize_faces_in_image
 
 # get an input image for anonymization
 original_image = load_image("my_dataset/friends.jpg")
@@ -109,28 +108,18 @@ original_image = load_image("my_dataset/friends.jpg")
 fa = face_alignment.FaceAlignment(
     face_alignment.LandmarksType.TWO_D, face_detector="sfd"
 )
-face_image_size = 512
-original_face_images, image_to_face_matrices = extract_faces(
-    fa, original_image, face_image_size
+
+# generate an image that anonymizes faces
+anon_image = anonymize_faces_in_image(
+    image=original_image,
+    face_alignment=fa,
+    pipe=pipe,
+    generator=generator,
+    face_image_size=512,
+    num_inference_steps=25,
+    guidance_scale=4.0,
+    anonymization_degree=1.25,
 )
-
-anon_image = original_image
-for original_face_image, image_to_face_mat in zip(
-    original_face_images, image_to_face_matrices
-):
-    # generate an image that anonymizes faces
-    anon_face_image = pipe(
-        source_image=original_face_image,
-        conditioning_image=original_face_image,
-        num_inference_steps=25,
-        guidance_scale=4.0,
-        generator=generator,
-        anonymization_degree=1.25,
-    ).images[0]
-
-    anon_image = paste_foreground_onto_background(
-        anon_face_image, anon_image, image_to_face_mat
-    )
 anon_image.save("anon.png")
 ```
 
