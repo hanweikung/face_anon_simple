@@ -1,6 +1,10 @@
 # Face Anonymization Made Simple (WACV 2025)
 
+[arXiv](http://arxiv.org/abs/2411.00762)
+
 ![teaser](teaser.jpg)
+
+Our face anonymization technique preserves the original facial expressions, head positioning, eye direction, and background elements, effectively masking identity while retaining other crucial details. The anonymized face blends seamlessly into its original photograph, making it ideal for diverse real-world applications.
 
 ## Setup
 
