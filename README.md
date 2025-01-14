@@ -83,7 +83,7 @@ Create an anonymized version of an image if the image contains a single face and
 
 ```python
 # get an input image for anonymization
-original_image = load_image("my_dataset/14795.png")
+original_image = load_image("my_dataset/test/14795.png")
 
 # generate an image that anonymizes faces
 anon_image = pipe(
@@ -106,7 +106,7 @@ import face_alignment
 from utils.anonymize_faces_in_image import anonymize_faces_in_image
 
 # get an input image for anonymization
-original_image = load_image("my_dataset/friends.jpg")
+original_image = load_image("my_dataset/test/friends.jpg")
 
 # SFD (likely best results, but slower)
 fa = face_alignment.FaceAlignment(
@@ -133,8 +133,8 @@ Create an image that swap faces.
 
 ```python
 # get source and conditioning (driving) images for face swap
-source_image = load_image("my_dataset/00482.png")
-conditioning_image = load_image("my_dataset/14795.png")
+source_image = load_image("my_dataset/test/00482.png")
+conditioning_image = load_image("my_dataset/test/14795.png")
 
 # generate an image that swaps faces
 swap_image = pipe(
