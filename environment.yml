@@ -1,6 +1,6 @@
 name: face-anon-simple
 dependencies:
-  - python=3.8
+  - python=3.8.18
   - pip
   - pip:
     - torch==2.1
@@ -14,3 +14,5 @@ dependencies:
     - bitsandbytes==0.44.1
     - ipykernel==6.29.5
     - face-alignment==1.4.1
+    - albumentations==1.4.1
+    - wandb==0.16.3

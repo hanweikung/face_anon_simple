@@ -1,0 +1,2 @@
+{"source_image": "celeb/real/18147_06771.png", "conditioning_image": "celeb/real/01758_01758.png", "ground_truth": "celeb/fake/18147_06771-01758_01758.png"}
+{"source_image": "celeb/real/01758_09704.png", "conditioning_image": "celeb/fake/18147_06771-01758_01758.png", "ground_truth": "celeb/real/01758_01758.png"}
