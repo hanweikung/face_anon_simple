@@ -154,7 +154,7 @@ We also provide the [demo.ipynb](https://github.com/hanweikung/face_anon_simple/
 
 Our model learns face swapping for anonymization. You can train it using your own face-swapped images.
 
-### Training Data Structure
+### Training data structure
 
 Sample training data is available in the `my_dataset/train` directory. Real images are stored in the `real` subdirectory, while face-swapped images are stored in the `fake` subdirectory.
 
@@ -172,7 +172,7 @@ my_dataset/
 └── train_dataset_loading_script.py
 ```
 
-### Data Loading and Configuration
+### Data loading and configuration
 
 Training data is loaded using a JSON lines file (`my_dataset/train.jsonl`) and a dataset loading script (`my_dataset/train_dataset_loading_script.py`), both provided as examples.
 
@@ -194,7 +194,7 @@ _URLS = {
 }
 ```
 
-### Training Script Setup
+### Training script setup
 
 A bash script, `train_referencenet.sh`, with the training command is provided. Update the file paths and adjust parameters as needed:
 
