@@ -93,6 +93,8 @@ anon_image = pipe(
     guidance_scale=4.0,
     generator=generator,
     anonymization_degree=1.25,
+    width=512,
+    height=512,
 ).images[0]
 anon_image.save("anon.png")
 ```
@@ -144,11 +146,17 @@ swap_image = pipe(
     guidance_scale=4.0,
     generator=generator,
     anonymization_degree=0.0,
+    width=512,
+    height=512,
 ).images[0]
 swap_image.save("swap.png")
 ```
 
 We also provide the [demo.ipynb](https://github.com/hanweikung/face_anon_simple/blob/main/demo.ipynb) notebook, which guides you through the steps mentioned above.
+
+### Note on image resolution
+
+Our model was trained on 512x512 images. To ensure correct results, always pass `width=512` and `height=512` to the `pipe` function. This ensures input images are resized appropriately.
 
 ## Training
 

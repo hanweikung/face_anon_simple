@@ -33,6 +33,8 @@ def anonymize_faces_in_image(
             guidance_scale=guidance_scale,
             generator=generator,
             anonymization_degree=anonymization_degree,
+            width=face_image_size,
+            height=face_image_size,
         ).images[0]
 
         anon_image = paste_foreground_onto_background(
