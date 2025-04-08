@@ -250,6 +250,19 @@ To train your model, run:
 bash train_referencenet.sh
 ```
 
+## Citation
+
+```bibtex
+@InProceedings{Kung_2025_WACV,
+    author    = {Kung, Han-Wei and Varanka, Tuomas and Saha, Sanjay and Sim, Terence and Sebe, Nicu},
+    title     = {Face Anonymization Made Simple},
+    booktitle = {Proceedings of the Winter Conference on Applications of Computer Vision (WACV)},
+    month     = {February},
+    year      = {2025},
+    pages     = {1040-1050}
+}
+```
+
 ## Acknowledgements
 
 This work is built upon the [Diffusers](https://github.com/huggingface/diffusers) project. The [face extractor](https://github.com/hanweikung/face_anon_simple/blob/main/utils/extractor.py) is adapted from [DeepFaceLab](https://dagshub.com/idonov/DeepFaceLab/src/master/mainscripts/Extractor.py).
