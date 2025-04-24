@@ -250,7 +250,7 @@ To train your model, run:
 bash train_referencenet.sh
 ```
 
-## Test Images
+## Test images
 
 In our paper, we selected 1,000 images each from [CelebA-HQ](https://github.com/tkarras/progressive_growing_of_gans) and [FFHQ](https://github.com/NVlabs/ffhq-dataset) for quantitative analysis. The list of test images can be found in our [Hugging Face Hub repository](https://huggingface.co/datasets/hkung/face-anon-simple-dataset).
 
