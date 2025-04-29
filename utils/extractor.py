@@ -303,6 +303,7 @@ def extract_faces(model, image, face_image_size, face_type=FaceType.WHOLE_FACE):
             image_to_face_mat,
             (face_image_size, face_image_size),
             cv2.INTER_LANCZOS4,
+            borderValue=(255, 255, 255),
         )
 
         image_to_face_matrices.append(image_to_face_mat)
