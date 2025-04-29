@@ -59,6 +59,7 @@ class FaceType(IntEnum):
     FULL = 2
     FULL_NO_ALIGN = 3
     WHOLE_FACE = 4
+    WHOLE_FACE_NO_ALIGN = 5
     HEAD = 10
     HEAD_NO_ALIGN = 20
 
@@ -82,6 +83,7 @@ to_string_dict = {
     FaceType.FULL: "full_face",
     FaceType.FULL_NO_ALIGN: "full_face_no_align",
     FaceType.WHOLE_FACE: "whole_face",
+    FaceType.WHOLE_FACE_NO_ALIGN: "whole_face_no_align",
     FaceType.HEAD: "head",
     FaceType.HEAD_NO_ALIGN: "head_no_align",
     FaceType.MARK_ONLY: "mark_only",
@@ -94,6 +96,7 @@ FaceType_to_padding_remove_align = {
     FaceType.FULL: (0.2109375, False),
     FaceType.FULL_NO_ALIGN: (0.2109375, True),
     FaceType.WHOLE_FACE: (0.40, False),
+    FaceType.WHOLE_FACE_NO_ALIGN: (0.40, True),
     FaceType.HEAD: (0.70, False),
     FaceType.HEAD_NO_ALIGN: (0.70, True),
 }
@@ -328,7 +331,24 @@ def parse_args():
         default="./face_images",
         help="Path to output folder",
     )
+    parser.add_argument(
+        "--face_type",
+        type=str,
+        default="whole_face",
+        help=(
+            "Face type to extract (e.g., half_face, midfull_face, full_face, "
+            "full_face_no_align, whole_face, whole_face_no_align, head, "
+            "head_no_align, mark_only.)"
+        ),
+    )
     args = parser.parse_args()
+
+    # Convert face_type string to FaceType enum
+    try:
+        args.face_type = FaceType.fromString(args.face_type)
+    except Exception:
+        raise ValueError(f"Invalid face_type: {args.face_type}")
+
     return args
 
 
@@ -339,14 +359,14 @@ if __name__ == "__main__":
     fa = face_alignment.FaceAlignment(
         face_alignment.LandmarksType.TWO_D, face_detector="sfd"
     )
-    face_type = FaceType.WHOLE_FACE
     pil_image = load_image(args.image_path)
     face_images, image_to_face_matrices = extract_faces(
-        fa, pil_image, args.image_size, face_type
+        fa, pil_image, args.image_size, args.face_type
     )
 
     # Make sure the output folder exists
     os.makedirs(args.output_folder, exist_ok=True)
 
+    input_filename = Path(args.image_path).stem
     for i, face_image in enumerate(face_images):
-        face_image.save(Path(args.output_folder, f"face_{i:02}.jpg"))
+        face_image.save(Path(args.output_folder, f"{input_filename}_{i:02}.jpg"))
