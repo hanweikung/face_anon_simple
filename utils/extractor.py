@@ -370,4 +370,4 @@ if __name__ == "__main__":
 
     input_filename = Path(args.image_path).stem
     for i, face_image in enumerate(face_images):
-        face_image.save(Path(args.output_folder, f"{input_filename}_{i:02}.jpg"))
+        face_image.save(Path(args.output_folder, f"{input_filename}_{i:02}.png"))
