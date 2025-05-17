@@ -836,12 +836,12 @@ def main():
     # Freeze vae and image_encoder
     vae.requires_grad_(False)
     image_encoder.requires_grad_(False)
-    # unet.train()
-    unet.requires_grad_(False)
+    unet.train()
+    # unet.requires_grad_(False)
     # for p in unet.down_blocks[0].attentions[0].transformer_blocks[0].parameters():
     #     print(p.requires_grad)  # Expect to be False
     #     break
-    unet = set_parts_of_model_for_gradient_computation(unet)
+    # unet = set_parts_of_model_for_gradient_computation(unet)
     # Check if gradient will be calculated on the tensor
     # for p in unet.down_blocks[0].attentions[0].transformer_blocks[0].parameters():
     #     print(p.requires_grad)  # Expect to be True
