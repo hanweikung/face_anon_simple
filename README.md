@@ -269,4 +269,4 @@ In our paper, we selected 1,000 images each from [CelebA-HQ](https://github.com/
 
 ## Acknowledgements
 
-This work is built upon the [Diffusers](https://github.com/huggingface/diffusers) project. The [face extractor](https://github.com/hanweikung/face_anon_simple/blob/main/utils/extractor.py) is adapted from [DeepFaceLab](https://dagshub.com/idonov/DeepFaceLab/src/master/mainscripts/Extractor.py).
+This work is built upon the [Diffusers](https://github.com/huggingface/diffusers) project. The [face extractor](https://github.com/hanweikung/face_anon_simple/blob/main/utils/extractor.py) is adapted from [DeepFaceLab](https://github.com/iperov/DeepFaceLab/blob/master/mainscripts/Extractor.py).
