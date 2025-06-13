@@ -289,7 +289,8 @@ def get_transform_mat(image_landmarks, output_size, face_type, scale=1.0):
 
 
 def extract_faces(model, image, face_image_size, face_type=FaceType.WHOLE_FACE):
-    array = np.array(image)
+    # take the first three channels (R, G, B)
+    array = np.array(image)[:, :, :3]
     preds = model.get_landmarks(array)
 
     face_images = []

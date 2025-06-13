@@ -28,7 +28,8 @@ def parse_args():
 
 def paste_foreground_onto_background(fg_image, bg_image, rotation_matrix):
     fg_array = np.array(fg_image)
-    bg_array = np.array(bg_image)
+    # Take the first three channels (R, G, B)
+    bg_array = np.array(bg_image)[:, :, :3]
 
     # Get the dimensions (width and height) of the image
     height, width = bg_array.shape[:2]
