@@ -156,7 +156,7 @@ We also provide the [demo.ipynb](https://github.com/hanweikung/face_anon_simple/
 
 ### Note on image resolution
 
-Our model was trained on 512x512 images. To ensure correct results, always pass `width=512` and `height=512` to the `pipe` function. This ensures input images are resized appropriately.
+Our model was trained on 512x512 images. To ensure correct results, always set `width=512` and `height=512` in the `pipe` function, and `face_image_size=512` in the `anonymize_faces_in_image` function. This ensures that input images are resized correctly for the diffusion pipeline. If you're using a model trained on different sizes, like 768x768, adjust these parameters accordingly.
 
 ## Training
 
