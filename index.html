@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="Face Anonymization Made Simple — WACV 2025. A diffusion-based method for face anonymization using only reconstruction loss, no facial landmarks or masks required.">
+  <meta name="keywords" content="Face Anonymization, Diffusion Models, Face Swapping, Privacy, WACV 2025">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Face Anonymization Made Simple</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Castoro:ital@0;1&family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+  <style>
+    :root {
+      --page: #f7f5ef;
+      --surface: #ffffff;
+      --surface-alt: #f0ece3;
+      --text: #3d3b36;
+      --muted: #6c675f;
+      --line: rgba(61, 59, 54, 0.14);
+      --accent: #8c4b2f;
+      --shadow: 0 28px 80px rgba(62, 46, 37, 0.08);
+      --container: 960px;
+      --radius: 22px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: "Noto Sans", sans-serif;
+      color: var(--text);
+      overflow-x: hidden;
+      background:
+        radial-gradient(circle at top left,  rgba(185, 141, 112, 0.18), transparent 28%),
+        radial-gradient(circle at top right, rgba(114,  79,  57, 0.10), transparent 24%),
+        linear-gradient(180deg, #faf7f2 0%, var(--page) 46%, #f5f1e8 100%);
+      line-height: 1.7;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.16;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.25'/%3E%3C/svg%3E");
+      mix-blend-mode: multiply;
+    }
+
+    img { display: block; max-width: 100%; }
+    a   { color: inherit; }
+
+    .container {
+      width: min(calc(100% - 2rem), var(--container));
+      margin: 0 auto;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      padding: 3.5rem 0 2rem;
+      text-align: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.9rem 1.3rem;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.66);
+      box-shadow: 0 10px 30px rgba(90,69,56,0.05);
+      color: var(--muted);
+      font-family: "Noto Sans", sans-serif;
+      font-size: 0.95rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .oral-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.7rem 1rem;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #c9a55c 0%, #a37f3a 100%);
+      color: #fff;
+      font-family: "Noto Sans", sans-serif;
+      font-size: 0.94rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      box-shadow: 0 6px 16px rgba(165, 127, 58, 0.22);
+      margin-top: 0.8rem;
+    }
+
+    h1, h2, h3 {
+      font-family: "Castoro", serif;
+      font-weight: 400;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+      margin: 0;
+    }
+
+    h1 {
+      margin-top: 1.4rem;
+      font-size: clamp(2.4rem, 5.5vw, 4rem);
+    }
+
+    .authors, .affiliations {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.3rem 1.1rem;
+    }
+
+    .authors {
+      margin-top: 1.8rem;
+      font-size: 1.03rem;
+    }
+
+    .authors span, .affiliations span { white-space: nowrap; }
+
+    .authors a {
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: border-color 180ms ease, color 180ms ease;
+    }
+
+    .authors a:hover,
+    .authors a:focus-visible {
+      color: var(--accent);
+      border-color: currentColor;
+      outline: none;
+    }
+
+    .affiliations {
+      margin-top: 0.8rem;
+      color: var(--muted);
+      font-size: 0.98rem;
+    }
+
+    sup { font-size: 0.7em; vertical-align: super; }
+
+    /* ── Buttons ── */
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.9rem;
+      margin-top: 2rem;
+    }
+
+    .button-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.9rem 1.3rem;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      background: linear-gradient(180deg, #4d4d4d 0%, #2f2f2f 100%);
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      font-family: "Noto Sans", sans-serif;
+      font-size: 0.95rem;
+      box-shadow: 0 18px 40px rgba(33,33,33,0.22);
+      transform: translateY(0);
+      transition: transform 220ms cubic-bezier(0.2,0.9,0.2,1),
+                  box-shadow 220ms cubic-bezier(0.2,0.9,0.2,1);
+    }
+
+    .button-pill:hover,
+    .button-pill:focus-visible {
+      transform: translateY(-2px);
+      box-shadow: 0 24px 50px rgba(33,33,33,0.28);
+      outline: none;
+    }
+
+    .button-pill:active { transform: translateY(0); }
+
+    .button-icon {
+      font-size: 1.1rem;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    /* ── Panel / Card ── */
+    .panel {
+      background: rgba(255,255,255,0.80);
+      border: 1px solid rgba(92,77,65,0.10);
+      border-radius: calc(var(--radius) + 2px);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+    }
+
+    /* ── Teaser ── */
+    .teaser-shell { margin-top: 2.6rem; }
+
+    .hero-teaser { overflow: hidden; }
+
+    .hero-teaser-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.9rem;
+      padding: 1rem;
+    }
+
+    .teaser-column {
+      border-radius: 18px;
+      overflow: hidden;
+      background: #efeae0;
+    }
+
+    .teaser-column img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+    }
+
+    .teaser-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 2.8rem;
+      padding: 0.7rem 0.6rem;
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--muted);
+      background: linear-gradient(180deg, rgba(255,255,255,0.7), rgba(240,236,227,0.96));
+      border-top: 1px solid rgba(92,77,65,0.08);
+    }
+
+    .teaser-caption {
+      padding: 1.1rem 1.3rem 1.4rem;
+      color: var(--muted);
+      font-size: 0.97rem;
+      text-align: center;
+    }
+
+    /* ── Main layout ── */
+    main { padding-bottom: 5rem; }
+
+    section { padding: 1.5rem 0; }
+
+    .section-head {
+      margin-bottom: 1.25rem;
+      text-align: center;
+    }
+
+    .section-head p {
+      margin: 0.8rem auto 0;
+      color: var(--muted);
+    }
+
+    .section-card { padding: 1.7rem; }
+
+    /* ── Abstract ── */
+    .abstract {
+      text-align: justify;
+      text-wrap: pretty;
+    }
+
+    .abstract p { line-height: 1.75; font-size: 1rem; }
+    .abstract p + p { margin-top: 1rem; }
+
+    /* ── Method ── */
+    .method-content p,
+    .method-content li { line-height: 1.75; }
+
+    .method-content ol {
+      margin-left: 1.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .method-content li { margin-bottom: 0.5rem; }
+
+    .eq-block {
+      background: rgba(240,235,224,0.7);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 0.5rem 1rem;
+      margin: 0.6rem 0;
+      font-style: italic;
+      font-size: 0.95rem;
+      color: var(--text);
+    }
+
+    /* ── Figure / Strip cards ── */
+    .figure-stack { display: grid; gap: 1rem; }
+
+    .figure-card { overflow: hidden; }
+    .figure-card img { width: 100%; }
+
+    /* ── Borderless strip wrap ── */
+    .strip-wrap img {
+      width: 100%;
+      display: block;
+      border: 1px solid #e8e8e8;
+      border-radius: 3px;
+    }
+
+    .figure-caption {
+      padding: 0.9rem 1.2rem 1.1rem;
+      color: var(--muted);
+      font-size: 0.93rem;
+    }
+
+    /* ── Strip labels (below strip images) ── */
+    .strip-labels {
+      display: flex;
+      justify-content: space-around;
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-top: 6px;
+      padding: 0 2px;
+    }
+
+    .strip-labels span { flex: 1; text-align: center; }
+
+    /* ── Subsection headings (CelebA-HQ / FFHQ) ── */
+    .subsection-title {
+      font-family: "Castoro", serif;
+      font-weight: 400;
+      font-size: 1.3rem;
+      color: var(--text);
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 0.4rem;
+      margin: 1.8rem 0 1rem;
+    }
+
+    /* ── BibTeX ── */
+    .bibtex { position: relative; overflow: hidden; }
+
+    .bibtex pre {
+      margin: 0;
+      padding: 1.3rem;
+      overflow-x: auto;
+      white-space: pre;
+      border-radius: 16px;
+      background: #2f2b28;
+      color: #f5f2ed;
+      font-size: 0.92rem;
+      line-height: 1.65;
+      color-scheme: dark;
+    }
+
+    .copy-button {
+      margin-top: 1rem;
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 999px;
+      background: #2f2b28;
+      color: #fff;
+      padding: 0.7rem 1rem;
+      font: inherit;
+      cursor: pointer;
+      transition: transform 180ms ease, opacity 180ms ease;
+    }
+
+    .copy-button:hover,
+    .copy-button:focus-visible {
+      transform: translateY(-1px);
+      opacity: 0.88;
+      outline: none;
+    }
+
+    /* ── Footer ── */
+    footer {
+      padding: 0 0 4rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.93rem;
+    }
+
+    .footer-icon-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.2rem;
+      height: 2.2rem;
+      margin: 0 0.3rem 1rem;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.6);
+      color: var(--text);
+      transition: color 180ms ease, background 180ms ease, transform 180ms ease;
+    }
+
+    .footer-icon-link:hover,
+    .footer-icon-link:focus-visible {
+      color: var(--accent);
+      background: #fff;
+      transform: translateY(-2px);
+      outline: none;
+    }
+
+    .footer-icon-link i {
+      font-size: 1.1rem;
+      line-height: 1;
+    }
+
+    .footer-attribution {
+      margin-top: 0.5rem;
+      font-size: 0.85rem;
+    }
+
+    .footer-attribution a {
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: border-color 180ms ease;
+    }
+
+    .footer-attribution a:hover { border-color: var(--accent); }
+
+    /* ── Reveal animation ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 520ms cubic-bezier(0.2,0.9,0.2,1),
+                  transform 520ms cubic-bezier(0.2,0.9,0.2,1);
+    }
+
+    .reveal.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 700px) {
+      .hero-teaser-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .section-card { padding: 1.2rem; }
+
+      .hero { padding-top: 2.4rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .button-pill, .reveal, .copy-button, .authors a, .footer-icon-link { transition: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- =============================================
+     HERO — TITLE & AUTHORS
+============================================= -->
+<header class="hero">
+  <div class="container reveal">
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <div class="eyebrow">WACV 2025</div>
+      <div class="oral-badge">
+        <i class="fas fa-microphone-alt" aria-hidden="true" style="font-size: 0.88em;"></i>
+        Oral Presentation
+      </div>
+    </div>
+
+    <h1>Face Anonymization Made Simple</h1>
+
+    <div class="authors" style="margin-top: 1.8rem;">
+      <span><a href="https://hanweikung.github.io" target="_blank" rel="noopener">Han-Wei&nbsp;Kung</a><sup>1</sup>,</span>
+      <span><a href="https://scholar.google.com/citations?user=5QWyHT4AAAAJ&amp;hl=en" target="_blank" rel="noopener">Tuomas&nbsp;Varanka</a><sup>2</sup>,</span>
+      <span><a href="https://scholar.google.com/citations?user=prPfgTIAAAAJ&amp;hl=en" target="_blank" rel="noopener">Sanjay&nbsp;Saha</a><sup>3</sup>,</span>
+      <span><a href="https://scholar.google.com/citations?user=AdEsZwsAAAAJ&amp;hl=en" target="_blank" rel="noopener">Terence&nbsp;Sim</a><sup>3</sup>,</span>
+      <span><a href="https://scholar.google.com/citations?user=stFCYOAAAAAJ&amp;hl=en" target="_blank" rel="noopener">Nicu&nbsp;Sebe</a><sup>1</sup></span>
+    </div>
+
+    <div class="affiliations">
+      <span><sup>1</sup>University of Trento</span>
+      <span><sup>2</sup>University of Oulu</span>
+      <span><sup>3</sup>National University of Singapore</span>
+    </div>
+
+    <div class="button-row">
+      <a class="button-pill" href="https://arxiv.org/abs/2411.00762" target="_blank" rel="noopener">
+        <i class="ai ai-arxiv button-icon" aria-hidden="true"></i>
+        arXiv
+      </a>
+      <a class="button-pill" href="https://github.com/hanweikung/face_anon_simple" target="_blank" rel="noopener">
+        <i class="fab fa-github button-icon" aria-hidden="true"></i>
+        Code
+      </a>
+    </div>
+
+    <!-- Teaser -->
+    <div class="teaser-shell">
+      <div class="panel hero-teaser">
+        <div class="hero-teaser-grid">
+          <div class="teaser-column">
+            <img src="assets/images/teaser/15510_orig.jpg"  alt="Original face 1">
+            <div class="teaser-label">Original</div>
+          </div>
+          <div class="teaser-column">
+            <img src="assets/images/teaser/15510_ours.jpg"  alt="Ours — face 1">
+            <div class="teaser-label">Ours</div>
+          </div>
+          <div class="teaser-column">
+            <img src="assets/images/teaser/15510_falco.jpg" alt="FALCO — face 1">
+            <div class="teaser-label">FALCO</div>
+          </div>
+          <div class="teaser-column">
+            <img src="assets/images/teaser/15510_dp2.jpg"   alt="DP2 — face 1">
+            <div class="teaser-label">DP2</div>
+          </div>
+          <div class="teaser-column">
+            <img src="assets/images/teaser/17665_orig.jpg"   alt="Original face 2">
+            <div class="teaser-label">Original</div>
+          </div>
+          <div class="teaser-column">
+            <img src="assets/images/teaser/17665_ours.jpg"   alt="Ours — face 2">
+            <div class="teaser-label">Ours</div>
+          </div>
+          <div class="teaser-column">
+            <img src="assets/images/teaser/17665_riddle.jpg" alt="RiDDLE — face 2">
+            <div class="teaser-label">RiDDLE</div>
+          </div>
+          <div class="teaser-column">
+            <img src="assets/images/teaser/17665_dp2.jpg"    alt="DP2 — face 2">
+            <div class="teaser-label">DP2</div>
+          </div>
+        </div>
+        <div class="teaser-caption">
+          Our face anonymization technique preserves the original facial expressions,
+          head positioning, eye direction, and background elements, effectively masking
+          identity while retaining other crucial details. The anonymized face blends
+          seamlessly into its original photograph, making it ideal for diverse
+          real-world applications.
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+
+<main>
+
+<!-- =============================================
+     ABSTRACT
+============================================= -->
+<section id="abstract">
+  <div class="container reveal">
+    <div class="section-head">
+      <h2>Abstract</h2>
+    </div>
+    <div class="panel section-card abstract">
+      <p>
+        Current face anonymization techniques often depend on identity loss
+        calculated by face recognition models, which can be inaccurate and
+        unreliable. Additionally, many methods require supplementary data such
+        as facial landmarks and masks to guide the synthesis process. In
+        contrast, our approach uses diffusion models with only a reconstruction
+        loss, eliminating the need for facial landmarks or masks while still
+        producing images with intricate, fine-grained details.
+      </p>
+      <p>
+        We validated our results on two public benchmarks through both
+        quantitative and qualitative evaluations. Our model achieves
+        state-of-the-art performance in three key areas: identity
+        anonymization, facial attribute preservation, and image quality.
+        Beyond its primary function of anonymization, our model can also
+        perform face swapping tasks by incorporating an additional facial image
+        as input, demonstrating its versatility and potential for diverse
+        applications.
+      </p>
+    </div>
+  </div>
+</section>
+
+
+<!-- =============================================
+     METHOD
+============================================= -->
+<section id="method">
+  <div class="container reveal">
+    <div class="section-head">
+      <h2>Method</h2>
+    </div>
+    <div class="panel section-card">
+      <div class="method-content">
+        <p>
+          The architecture treats anonymization as a variant of face swapping. Two ReferenceNet
+          branches inject source and driving cues into a UNet. For anonymization, the same image is
+          fed to both branches, while identity cues in the source stream are suppressed to yield an
+          unknown identity.
+        </p>
+      </div>
+      <figure style="margin: 1.2rem 0 0;">
+        <img src="assets/images/pipeline/pipeline.svg"
+             style="width: 100%;"
+             alt="Network architecture diagram showing UNet, source ReferenceNet and driving ReferenceNet">
+      </figure>
+    </div>
+  </div>
+</section>
+
+
+<!-- =============================================
+     ANONYMIZATION DEGREE
+============================================= -->
+<section id="anon-degree">
+  <div class="container reveal">
+    <div class="section-head">
+      <h2>Controlling the Anonymization Degree</h2>
+      <p>
+        Increasing the anonymization degree <em>d</em> pushes the generated
+        identity further from the original.
+      </p>
+    </div>
+    <div class="figure-stack">
+      <div class="strip-wrap">
+        <img src="assets/images/anon_deg/08686.jpg"
+             alt="Anonymization degree example — subject 1">
+      </div>
+      <div class="strip-wrap">
+        <img src="assets/images/anon_deg/25484.jpg"
+             alt="Anonymization degree example — subject 2">
+      </div>
+    </div>
+    <div class="strip-labels" style="margin-top: 6px;">
+      <span>Original</span>
+      <span><em>d</em> = 0.3</span>
+      <span><em>d</em> = 0.6</span>
+      <span><em>d</em> = 0.9</span>
+      <span><em>d</em> = 1.2</span>
+    </div>
+  </div>
+</section>
+
+
+<!-- =============================================
+     ANONYMIZATION VARIATION (seeds)
+============================================= -->
+<section id="anon-variation">
+  <div class="container reveal">
+    <div class="section-head">
+      <h2>Diverse Anonymization Results</h2>
+      <p>
+        We can also use different integer seed values to produce varied
+        anonymization results from the same input image.
+      </p>
+    </div>
+    <div class="figure-stack">
+      <div class="strip-wrap">
+        <img src="assets/images/anon_var/25944.jpg"
+             alt="Anonymization variation — subject 1">
+      </div>
+      <div class="strip-wrap">
+        <img src="assets/images/anon_var/29471.jpg"
+             alt="Anonymization variation — subject 2">
+      </div>
+    </div>
+    <div class="strip-labels" style="margin-top: 6px;">
+      <span>Original</span>
+      <span>Seed 32</span>
+      <span>Seed 56</span>
+      <span>Seed 68</span>
+      <span>Seed 81</span>
+    </div>
+  </div>
+</section>
+
+
+<!-- =============================================
+     QUALITATIVE COMPARISON
+============================================= -->
+<section id="qualitative">
+  <div class="container reveal">
+    <div class="section-head">
+      <h2>Qualitative Comparison</h2>
+      <p>
+        We compare against DP2 (DeepPrivacy2), FALCO, and RiDDLE on the
+        CelebA-HQ and FFHQ benchmarks.
+      </p>
+    </div>
+
+    <h3 class="subsection-title">CelebA-HQ</h3>
+
+    <div class="figure-stack">
+      <div class="strip-wrap">
+        <img src="assets/images/anon/celeb/02162-02162.jpg" alt="CelebA-HQ comparison row 1">
+      </div>
+      <div class="strip-wrap">
+        <img src="assets/images/anon/celeb/29367-29367.jpg" alt="CelebA-HQ comparison row 2">
+      </div>
+      <div class="strip-wrap">
+        <img src="assets/images/anon/celeb/11383-11383.jpg" alt="CelebA-HQ comparison row 3">
+      </div>
+      <div class="strip-wrap">
+        <img src="assets/images/anon/celeb/20272-20272.jpg" alt="CelebA-HQ comparison row 4">
+      </div>
+    </div>
+    <div class="strip-labels" style="margin-top: 6px;">
+      <span>Original</span>
+      <span>Ours (<em>d</em>=1.2)</span>
+      <span>Ours (<em>d</em>=1.4)</span>
+      <span>FALCO</span>
+      <span>DP2</span>
+    </div>
+
+    <h3 class="subsection-title">FFHQ</h3>
+
+    <div class="figure-stack">
+      <div class="strip-wrap">
+        <img src="assets/images/anon/ffhq/55177-55177.jpg" alt="FFHQ comparison row 1">
+      </div>
+      <div class="strip-wrap">
+        <img src="assets/images/anon/ffhq/20804-20804.jpg" alt="FFHQ comparison row 2">
+      </div>
+      <div class="strip-wrap">
+        <img src="assets/images/anon/ffhq/14519-14519.jpg" alt="FFHQ comparison row 3">
+      </div>
+      <div class="strip-wrap">
+        <img src="assets/images/anon/ffhq/65094-65094.jpg" alt="FFHQ comparison row 4">
+      </div>
+    </div>
+    <div class="strip-labels" style="margin-top: 6px;">
+      <span>Original</span>
+      <span>Ours (<em>d</em>=1.2)</span>
+      <span>Ours (<em>d</em>=1.4)</span>
+      <span>RiDDLE</span>
+      <span>DP2</span>
+    </div>
+  </div>
+</section>
+
+
+<!-- =============================================
+     FACE SWAPPING
+============================================= -->
+<section id="face-swapping">
+  <div class="container reveal">
+    <div class="section-head">
+      <h2>Face Swapping</h2>
+      <p>
+        Beyond anonymization, our model can perform face swapping tasks by
+        incorporating an additional facial image as input (the source identity).
+      </p>
+    </div>
+    <div class="figure-stack">
+      <div class="strip-wrap">
+        <img src="assets/images/swap/celeb/11584-10217.jpg"
+             alt="Face swapping — CelebA-HQ">
+      </div>
+      <div class="strip-wrap">
+        <img src="assets/images/swap/ffhq/30200-03120.jpg"
+             alt="Face swapping — FFHQ">
+      </div>
+    </div>
+    <div class="strip-labels" style="margin-top: 6px;">
+      <span>Source</span>
+      <span>Driving</span>
+      <span>Ours</span>
+      <span>InSwapper</span>
+      <span>BlendFace</span>
+      <span>DiffSwap</span>
+    </div>
+  </div>
+</section>
+
+
+<!-- =============================================
+     BIBTEX
+============================================= -->
+<section id="BibTeX">
+  <div class="container reveal">
+    <div class="section-head">
+      <h2>BibTeX</h2>
+    </div>
+    <div class="panel section-card bibtex">
+      <pre id="bibtex-block">@InProceedings{Kung_2025_WACV,
+    author    = {Kung, Han-Wei and Varanka, Tuomas and Saha, Sanjay and Sim, Terence and Sebe, Nicu},
+    title     = {Face Anonymization Made Simple},
+    booktitle = {Proceedings of the Winter Conference on Applications of Computer Vision (WACV)},
+    month     = {February},
+    year      = {2025},
+    pages     = {1040-1050}
+}</pre>
+      <button class="copy-button" id="copy-bibtex" type="button">Copy BibTeX</button>
+    </div>
+  </div>
+</section>
+
+</main>
+
+
+<!-- =============================================
+     FOOTER
+============================================= -->
+<footer class="reveal">
+  <div class="container">
+    <div style="margin-bottom: 0.5rem;">
+      <a class="footer-icon-link"
+         href="https://github.com/hanweikung/face_anon_simple"
+         target="_blank" rel="noopener"
+         title="GitHub repository">
+        <i class="fab fa-github" aria-hidden="true"></i>
+      </a>
+      <a class="footer-icon-link"
+         href="https://arxiv.org/abs/2411.00762"
+         target="_blank" rel="noopener"
+         title="arXiv paper">
+        <i class="ai ai-arxiv" aria-hidden="true"></i>
+      </a>
+    </div>
+    <p class="footer-attribution">
+      This page is inspired by the
+      <a href="https://nerfies.github.io" target="_blank" rel="noopener">Nerfies</a>
+      project page, which is licensed under the
+      <a href="http://creativecommons.org/licenses/by-sa/4.0/"
+         target="_blank" rel="noopener">Creative Commons Attribution-ShareAlike 4.0 License</a>.
+    </p>
+  </div>
+</footer>
+
+
+<script>
+  // Reveal on scroll
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.1 }
+  );
+  document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+
+  // Copy BibTeX
+  const copyButton = document.getElementById('copy-bibtex');
+  const bibtexText = document.getElementById('bibtex-block').textContent;
+  copyButton.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(bibtexText);
+      copyButton.textContent = 'Copied!';
+    } catch {
+      copyButton.textContent = 'Copy failed';
+    }
+    setTimeout(() => { copyButton.textContent = 'Copy BibTeX'; }, 1600);
+  });
+</script>
+
+</body>
+</html>
